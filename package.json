@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "start:ts": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,9 @@
   },
   "homepage": "https://github.com/cursosdevfull/NodeJS_Group10#readme",
   "dependencies": {
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "nodemon": "^2.0.19",
+    "ts-node": "^10.8.2"
   },
   "devDependencies": {
     "jest": "^28.1.2"
