@@ -1,27 +1,22 @@
 import http from "http";
-import { IncomingMessage, ServerResponse } from "http";
+//import { IncomingMessage, ServerResponse } from "http";
+import { Application, Request, Response } from "express";
 
 export abstract class Bootstrap {
   abstract initialize(): Promise<any>;
 }
 
 export default class extends Bootstrap {
-  //requestListener: (req: IncomingMessage, res: ServerResponse) => void;
-
   constructor(
-    private readonly requestListener: (
-      req: IncomingMessage,
-      res: ServerResponse
-    ) => void
-  ) {
+    private readonly app: Application
+  ) //private readonly requestListener: (req: Request, res: Response) => void
+  {
     super();
-    // this.requestListener = requestListener;
   }
 
   initialize() {
-    console.log(this.requestListener);
     return new Promise<any>((resolve, reject) => {
-      const server = http.createServer(this.requestListener);
+      const server = http.createServer(this.app);
 
       server
         .listen(3000)
