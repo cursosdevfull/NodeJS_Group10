@@ -1,31 +1,30 @@
-//import { IncomingMessage, ServerResponse } from "http";
 import { Request, Response } from "express";
-import Route, { exceptionNotFound, getRoute } from "./routes";
 import express, { Application } from "express";
+import routerUser from "./modules/user/interfaces/router";
+import routerHealth from "./helpers/health";
+import HandlerErrors from "./helpers/errors";
 
 class App {
   readonly expressApp: Application;
 
   constructor() {
     this.expressApp = express();
+    this.mountHealthCheck();
     this.mountRoutes();
+    this.mountErrors();
+  }
+
+  mountHealthCheck() {
+    this.expressApp.use("/", routerHealth);
   }
 
   mountRoutes(): void {
-    this.expressApp.get("/user/description", (req: Request, res: Response) => {
-      res.send("<h2>User: Sergio</h2>");
-    });
+    this.expressApp.use("/user", routerUser);
   }
 
-  /* static requestListener(request: Request, response: Response) {
-    const route: Route | undefined = getRoute(request.url as string);
-
-    if (route) {
-      route.execute(request, response);
-    } else {
-      exceptionNotFound(request, response);
-    }
-  } */
+  mountErrors(): void {
+    this.expressApp.use(HandlerErrors.notFound);
+  }
 }
 
 export default new App().expressApp;
