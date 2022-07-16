@@ -4,4 +4,4 @@ entidad
 - lastname
 - email
 - active
-- licenseDriver
+- driverLicense

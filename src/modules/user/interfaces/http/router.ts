@@ -1,7 +1,12 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
+import UserApplication from "../../application/user.application";
+import { UserRepository } from "../../domain/user.repository";
+import UserInfrastructure from "../../infrastructure/user.infrastructure";
 import Controller from "./controller";
 
-const controller = new Controller();
+const infrastructure: UserRepository = new UserInfrastructure();
+const application = new UserApplication(infrastructure);
+const controller = new Controller(application);
 
 class UserRouter {
   readonly expressRouter;
@@ -12,10 +17,9 @@ class UserRouter {
   }
 
   mountRoutes() {
-    this.expressRouter.get("/description", controller.description);
-    this.expressRouter.get("/list", controller.list);
-    this.expressRouter.get("/detail", controller.detail);
-    this.expressRouter.get("/delete", controller.delete);
+    this.expressRouter.get("/", (req: Request, res: Response) => {
+      controller.list(req, res);
+    });
   }
 }
 
