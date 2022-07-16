@@ -1,6 +1,5 @@
-import { Request, Response } from "express";
 import express, { Application } from "express";
-import routerUser from "./modules/user/interfaces/router";
+import routerUser from "./modules/user/interfaces/http/router";
 import routerHealth from "./helpers/health";
 import HandlerErrors from "./helpers/errors";
 

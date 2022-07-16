@@ -1,0 +1,7 @@
+entidad
+- id
+- name
+- lastname
+- email
+- active
+- licenseDriver
