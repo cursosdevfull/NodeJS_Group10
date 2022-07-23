@@ -8,8 +8,8 @@ export default class UserApplication {
     return this.userRepository.list();
   }
 
-  listOne(id: number) {
-    return this.userRepository.listOne(id);
+  listOne(guid: string) {
+    return this.userRepository.listOne(guid);
   }
 
   insert(user: User) {

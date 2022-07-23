@@ -17,9 +17,12 @@ class UserRouter {
   }
 
   mountRoutes() {
-    this.expressRouter.get("/", (req: Request, res: Response) => {
+    /*     this.expressRouter.get("/", (req: Request, res: Response) => {
       controller.list(req, res);
-    });
+    }); */
+    this.expressRouter.get("/", controller.list);
+    this.expressRouter.get("/:guid", controller.listOne);
+    this.expressRouter.post("/", controller.insert);
   }
 }
 

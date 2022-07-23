@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import UserApplication from "../../application/user.application";
-import User, { UserProperties } from "../../domain/user";
-import { UserRepository } from "../../domain/user.repository";
-import UserInfrastructure from "../../infrastructure/user.infrastructure";
+import User, { UserInsert, UserProperties } from "../../domain/user";
 
 export default class {
   constructor(private application: UserApplication) {
-    //this.list = this.list.bind(this);
+    this.list = this.list.bind(this);
+    this.listOne = this.listOne.bind(this);
+    this.insert = this.insert.bind(this);
   }
 
   list(req: Request, res: Response) {
@@ -15,11 +15,27 @@ export default class {
   }
 
   listOne(req: Request, res: Response) {
-    return this.application.listOne(1);
+    //const id = (req.params.id as unknown) as number;
+    //const id = +req.params.id
+    //const { id } = req.params;
+    const { guid } = req.params;
+    //const result = this.application.listOne(+id);
+    const result = this.application.listOne(guid);
+    res.json(result);
   }
 
   insert(req: Request, res: Response) {
+    const body: UserInsert = req.body;
+    res.json(req.body);
     const properties: UserProperties = {
+      name: body.name,
+      lastname: body.lastname,
+      email: body.email,
+      password: body.password,
+    };
+    const user = new User(properties);
+    const result = this.application.insert(user);
+    /* const properties: UserProperties = {
       id: 10,
       name: "John",
       lastname: "Travolta",
@@ -27,13 +43,12 @@ export default class {
       password: "1234",
       refreshToken: "abc",
     };
-    const user: User = new User(properties);
-
-    return this.application.insert(user);
+    const user: User = new User(properties); */
+    // return this.application.insert(user);
   }
 
   update(req: Request, res: Response) {
-    const properties: UserProperties = {
+    /*  const properties: UserProperties = {
       id: 1,
       name: "John",
       lastname: "Travolta",
@@ -42,11 +57,11 @@ export default class {
       refreshToken: "abc",
     };
     const user: User = new User(properties);
-    return this.application.update(user);
+    return this.application.update(user); */
   }
 
   delete(req: Request, res: Response) {
-    const properties: UserProperties = {
+    /*  const properties: UserProperties = {
       id: 1,
       name: "John",
       lastname: "Travolta",
@@ -55,7 +70,7 @@ export default class {
       refreshToken: "abc",
     };
     const user: User = new User(properties);
-    return this.application.delete(user);
+    return this.application.delete(user); */
   }
 
   /*  description(req: Request, res: Response) {
