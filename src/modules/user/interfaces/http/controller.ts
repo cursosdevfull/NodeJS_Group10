@@ -1,94 +1,65 @@
 import { Request, Response } from "express";
 import UserApplication from "../../application/user.application";
-import User, { UserInsert, UserProperties } from "../../domain/user";
+import User from "../../domain/user";
+import UserFactory from "../../domain/user-factory";
+import { EmailVO } from "../../domain/value-objects/email.vo";
+import { UserInsertMapping } from "./dto/response/user-insert.dto";
+import { UserListOneMapping } from "./dto/response/user-list-one.dto";
+import { UserListDTO, UserListMapping } from "./dto/response/user-list.dto";
 
 export default class {
   constructor(private application: UserApplication) {
     this.list = this.list.bind(this);
     this.listOne = this.listOne.bind(this);
     this.insert = this.insert.bind(this);
+    this.update = this.update.bind(this);
+    this.delete = this.delete.bind(this);
   }
 
   list(req: Request, res: Response) {
     const list = this.application.list();
-    res.json(list);
-  }
-
-  listOne(req: Request, res: Response) {
-    //const id = (req.params.id as unknown) as number;
-    //const id = +req.params.id
-    //const { id } = req.params;
-    const { guid } = req.params;
-    //const result = this.application.listOne(+id);
-    const result = this.application.listOne(guid);
+    const result: UserListDTO = new UserListMapping().execute(list);
     res.json(result);
   }
 
-  insert(req: Request, res: Response) {
-    const body: UserInsert = req.body;
-    res.json(req.body);
-    const properties: UserProperties = {
-      name: body.name,
-      lastname: body.lastname,
-      email: body.email,
-      password: body.password,
-    };
-    const user = new User(properties);
-    const result = this.application.insert(user);
-    /* const properties: UserProperties = {
-      id: 10,
-      name: "John",
-      lastname: "Travolta",
-      email: "travolta@gmail.com",
-      password: "1234",
-      refreshToken: "abc",
-    };
-    const user: User = new User(properties); */
-    // return this.application.insert(user);
+  listOne(req: Request, res: Response) {
+    const { guid } = req.params;
+    const data = this.application.listOne(guid).properties();
+    const result = new UserListOneMapping().execute(data);
+    res.json(result);
+  }
+
+  async insert(req: Request, res: Response) {
+    const { name, lastname, email, password } = req.body;
+    const user: User = await new UserFactory().create(
+      name,
+      lastname,
+      EmailVO.create(email),
+      password
+    );
+    const data = this.application.insert(user);
+    const result = new UserInsertMapping().execute(data);
+    res.json(result);
   }
 
   update(req: Request, res: Response) {
-    /*  const properties: UserProperties = {
-      id: 1,
-      name: "John",
-      lastname: "Travolta",
-      email: "travolta@gmail.com",
-      password: "1234",
-      refreshToken: "abc",
-    };
-    const user: User = new User(properties);
-    return this.application.update(user); */
+    const { guid } = req.params;
+    const { name, lastname, email, password } = req.body;
+
+    const user = this.application.listOne(guid);
+    user.update({ name, lastname, email: EmailVO.create(email), password });
+
+    const result = this.application.update(user);
+    res.json(result);
   }
 
   delete(req: Request, res: Response) {
-    /*  const properties: UserProperties = {
-      id: 1,
-      name: "John",
-      lastname: "Travolta",
-      email: "travolta@gmail.com",
-      password: "1234",
-      refreshToken: "abc",
-    };
-    const user: User = new User(properties);
-    return this.application.delete(user); */
-  }
+    const { guid } = req.params;
 
-  /*  description(req: Request, res: Response) {
-    res.send("<h2>User: Sergio</h2>");
-  }
+    const user = this.application.listOne(guid);
+    user.delete();
 
-  list(req: Request, res: Response) {
-    res.json([
-      { username: "shidalgo", active: true },
-      { username: "pneira", active: true },
-    ]);
+    const result = this.application.update(user);
+    res.json(result);
   }
-
-  detail(req: Request, res: Response) {
-    res.json({ username: "shidalgo", active: false });
-  }
-
-  delete(req: Request, res: Response) {
-    res.send("User deleted successfully");
-  } */
 }

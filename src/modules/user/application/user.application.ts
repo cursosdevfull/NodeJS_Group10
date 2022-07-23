@@ -1,4 +1,4 @@
-import User from "../domain/user";
+import User, { UserProperties } from "../domain/user";
 import { UserRepository } from "../domain/user.repository";
 
 export default class UserApplication {
@@ -16,11 +16,7 @@ export default class UserApplication {
     return this.userRepository.insert(user);
   }
 
-  update(user: User) {
+  update(user: User): UserProperties {
     return this.userRepository.update(user);
-  }
-
-  delete(user: User) {
-    return this.userRepository.delete(user);
   }
 }

@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import UserApplication from "../../application/user.application";
 import { UserRepository } from "../../domain/user.repository";
 import UserInfrastructure from "../../infrastructure/user.infrastructure";
@@ -17,12 +17,11 @@ class UserRouter {
   }
 
   mountRoutes() {
-    /*     this.expressRouter.get("/", (req: Request, res: Response) => {
-      controller.list(req, res);
-    }); */
     this.expressRouter.get("/", controller.list);
     this.expressRouter.get("/:guid", controller.listOne);
     this.expressRouter.post("/", controller.insert);
+    this.expressRouter.put("/:guid", controller.update);
+    this.expressRouter.delete("/:guid", controller.delete);
   }
 }
 

@@ -1,5 +1,5 @@
 entidad
-- id
+- guid
 - name
 - lastname
 - email

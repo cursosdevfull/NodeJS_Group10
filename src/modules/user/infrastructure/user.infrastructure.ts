@@ -1,47 +1,63 @@
-import User from "../domain/user";
+import User, { UserProperties } from "../domain/user";
+import UserFactory from "../domain/user-factory";
 import { UserRepository } from "../domain/user.repository";
+import { EmailVO } from "../domain/value-objects/email.vo";
 
-const users: User[] = [
-  new User({
-    //id: 1,
-    name: "John",
-    lastname: "Dick",
-    email: "johndick@correo.com",
-    password: "123",
-    //active: true,
-    //refreshToken: "abcde",
-    //guid: "5981d638-8b3d-4c82-a3ae-6c2aeeabe8cd",
-  }),
-  new User({
-    //id: 2,
-    name: "Carlos",
-    lastname: "Astarte",
-    email: "carlos@correo.com",
-    password: "12345",
-    //active: true,
-    //refreshToken: "abcdefg",
-    //guid: "1506eb31-af0f-403f-b811-78dec4206cab",
-  }),
+let users: User[] = [];
+
+const promisesUsers = [
+  new UserFactory().create(
+    "John",
+    "Dick",
+    EmailVO.create("johndick@correo.com"),
+    "123"
+  ),
+  new UserFactory().create(
+    "Carlos",
+    "Astarte",
+    EmailVO.create("carlos@correo.com"),
+    "12345"
+  ),
 ];
 
+Promise.all(promisesUsers).then((result) => (users = result));
+
+/* const users: User[] = [
+  new UserFactory().create(
+    "John",
+    "Dick",
+    EmailVO.create("johndick@correo.com"),
+    "123"
+  ),
+  new UserFactory().create(
+    "Carlos",
+    "Astarte",
+    EmailVO.create("carlos@correo.com"),
+    "12345"
+  ),
+]; */
+
 export default class UserInfrastructure implements UserRepository {
-  list(): User[] {
-    return users;
+  list(): UserProperties[] {
+    return users
+      .filter((el: User) => el.properties().active)
+      .map((el: User) => el.properties());
   }
   listOne(guid: string): User {
-    return Object.assign(
-      {},
-      users.find((el: User) => el.properties().guid === guid)
+    return users
+      .filter((el: User) => el.properties().active)
+      .find((el: User) => el.properties().guid === guid);
+  }
+  insert(user: User): UserProperties {
+    users.push(user);
+    return user.properties();
+  }
+  update(user: User): any {
+    const { guid } = user.properties();
+    const userIndex: number = users.findIndex(
+      (el: User) => el.properties().guid === guid
     );
-  }
-  insert(user: User): void {
-    console.log("user inserted", user);
-  }
-  update(user: User): void {
-    user.delete();
-  }
-  delete(user: User): void {
-    console.log("user deleted", user);
-    user.delete();
+    users[userIndex] = user;
+    return user;
   }
 }

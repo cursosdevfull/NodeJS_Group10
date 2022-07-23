@@ -1,9 +1,8 @@
-import User from "./user";
+import User, { UserProperties } from "./user";
 
 export interface UserRepository {
-  list(): User[];
+  list(): UserProperties[];
   listOne(guid: string): User;
-  insert(user: User): void;
-  update(user: User): void;
-  delete(user: User): void;
+  insert(user: User): UserProperties;
+  update(user: User): UserProperties;
 }
