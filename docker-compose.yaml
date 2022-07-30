@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  mysql-server:
+    image: mysql:8
+    container_name: mysqlserver
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=12345
+      - MYSQL_DATABASE=curso10
+    ports:
+      - "3307:3306"
+    networks:
+      - net-curso10
+    volumes:
+      - data-mysql-vol:/var/lib/mysql
+
+networks:
+  net-curso10:
+
+volumes:
+  data-mysql-vol:
