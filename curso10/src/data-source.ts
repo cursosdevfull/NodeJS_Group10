@@ -9,7 +9,7 @@ export const AppDataSource = new DataSource({
   password: "12345",
   database: "curso10",
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: ["src/entity/**/*.entity.ts"],
   migrations: [],
   subscribers: [],
