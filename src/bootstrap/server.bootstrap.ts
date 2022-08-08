@@ -1,16 +1,9 @@
 import http from "http";
-//import { IncomingMessage, ServerResponse } from "http";
-import { Application, Request, Response } from "express";
-
-export abstract class Bootstrap {
-  abstract initialize(): Promise<any>;
-}
+import { Application } from "express";
+import { Bootstrap } from "./bootstrap";
 
 export default class extends Bootstrap {
-  constructor(
-    private readonly app: Application
-  ) //private readonly requestListener: (req: Request, res: Response) => void
-  {
+  constructor(private readonly app: Application) {
     super();
   }
 

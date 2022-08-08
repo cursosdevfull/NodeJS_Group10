@@ -1,7 +1,10 @@
+import { DataSource } from "typeorm";
 import User, { UserProperties } from "../domain/user";
 import UserFactory from "../domain/user-factory";
 import { UserRepository } from "../domain/user.repository";
 import { EmailVO } from "../domain/value-objects/email.vo";
+import { UserEntity } from "./user.entity";
+import DataBaseBootstrap from "../../../bootstrap/database.bootstrap";
 
 let users: User[] = [];
 
@@ -48,8 +51,25 @@ export default class UserInfrastructure implements UserRepository {
       .filter((el: User) => el.properties().active)
       .find((el: User) => el.properties().guid === guid);
   }
-  insert(user: User): UserProperties {
-    users.push(user);
+
+  async insert(user: User): Promise<UserProperties> {
+    const userInsert = new UserEntity();
+
+    const { guid, name, lastname, email, password, refreshToken, active } =
+      user.properties();
+    Object.assign(userInsert, {
+      guid,
+      name,
+      lastname,
+      email: email.value,
+      password,
+      refreshToken,
+      active,
+    });
+
+    await DataBaseBootstrap.dataSource
+      .getRepository(UserEntity)
+      .save(userInsert);
     return user.properties();
   }
   update(user: User): any {

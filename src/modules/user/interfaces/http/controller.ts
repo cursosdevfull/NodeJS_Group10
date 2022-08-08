@@ -37,7 +37,7 @@ export default class {
       EmailVO.create(email),
       password
     );
-    const data = this.application.insert(user);
+    const data = await this.application.insert(user);
     const result = new UserInsertMapping().execute(data);
     res.json(result);
   }
