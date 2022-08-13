@@ -1,11 +1,11 @@
-import { UserProperties } from "src/modules/user/domain/user";
+import User, { UserProperties } from "src/modules/user/domain/user";
 import { DTO } from "./dto.interface";
 
 interface UserDTO {
   name: string;
   lastname: string;
   guid: string;
-  password: string;
+  email: string;
 }
 
 export type UserListDTO = UserDTO[];
@@ -17,7 +17,7 @@ export class UserListMapping extends DTO<UserProperties[], UserListDTO> {
         name: user.name,
         lastname: user.lastname,
         guid: user.guid,
-        password: user.password,
+        email: user.email.value,
       };
     });
   }

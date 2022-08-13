@@ -1,4 +1,5 @@
-import User, { UserProperties } from "../domain/user";
+import { err } from "neverthrow";
+import User, { UserProperties, UserUpdate } from "../domain/user";
 import { UserRepository } from "../domain/user.repository";
 
 export default class UserApplication {
@@ -16,7 +17,18 @@ export default class UserApplication {
     return this.userRepository.insert(user);
   }
 
-  update(user: User): UserProperties {
-    return this.userRepository.update(user);
+  async update(guid: string, user: Partial<UserUpdate>) {
+    /*     const searchUserResult = await this.listOne(guid);
+    if (searchUserResult.isErr()) {
+      return err(new UserNot)
+    }
+    userToUpdate.update(user); */
+    return this.userRepository.update(guid, user);
+  }
+
+  async delete(guid: string) {
+    /*     const userToDelete = await this.listOne(guid);
+    userToDelete.delete();
+    return this.userRepository.delete(userToDelete); */
   }
 }
