@@ -6,6 +6,8 @@ import { EmailVO } from "../../domain/value-objects/email.vo";
 import { UserInsertMapping } from "./dto/response/user-insert.dto";
 import { UserListOneMapping } from "./dto/response/user-list-one.dto";
 import { UserListDTO, UserListMapping } from "./dto/response/user-list.dto";
+import { GuidVO } from "../../domain/value-objects/guid.vo";
+import { UserDeleteMapping } from "./dto/response/user-delete.dto";
 
 export default class {
   constructor(private application: UserApplication) {
@@ -16,17 +18,32 @@ export default class {
     this.delete = this.delete.bind(this);
   }
 
-  list(req: Request, res: Response) {
-    const list = this.application.list();
-    const result: UserListDTO = new UserListMapping().execute(list);
+  async list(req: Request, res: Response) {
+    const list = await this.application.list();
+    const result: UserListDTO = new UserListMapping().execute(
+      list.map((user) => user.properties())
+    );
     res.json(result);
   }
 
-  listOne(req: Request, res: Response) {
+  async listOne(req: Request, res: Response) {
     const { guid } = req.params;
-    const data = this.application.listOne(guid).properties();
-    const result = new UserListOneMapping().execute(data);
-    res.json(result);
+
+    const guidResult = GuidVO.create(guid);
+    if (guidResult.isErr()) {
+      return res.status(411).send(guidResult.error.message);
+    }
+
+    const userResult = await this.application.listOne(guid);
+
+    if (userResult.isErr()) {
+      return res.status(404).send(userResult.error.message);
+    } else if (userResult.isOk()) {
+      const result = new UserListOneMapping().execute(
+        userResult.value.properties()
+      );
+      return res.json(result);
+    }
   }
 
   async insert(req: Request, res: Response) {
@@ -38,28 +55,46 @@ export default class {
       password
     );
     const data = await this.application.insert(user);
-    const result = new UserInsertMapping().execute(data);
+    const result = new UserInsertMapping().execute(data.properties());
     res.json(result);
   }
 
-  update(req: Request, res: Response) {
+  async update(req: Request, res: Response) {
     const { guid } = req.params;
-    const { name, lastname, email, password } = req.body;
+    const fieldsToUpdate = req.body;
 
-    const user = this.application.listOne(guid);
-    user.update({ name, lastname, email: EmailVO.create(email), password });
+    const guidResult = GuidVO.create(guid);
+    if (guidResult.isErr()) {
+      return res.status(411).send(guidResult.error.message);
+    }
 
-    const result = this.application.update(user);
-    res.json(result);
+    const dataResult = await this.application.update(guid, fieldsToUpdate);
+    if (dataResult.isErr()) {
+      res.status(404).send(dataResult.error.message);
+    } else {
+      const result = new UserInsertMapping().execute(
+        dataResult.value.properties()
+      );
+      res.json(result);
+    }
   }
 
-  delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response) {
     const { guid } = req.params;
 
-    const user = this.application.listOne(guid);
-    user.delete();
+    const guidResult = GuidVO.create(guid);
+    if (guidResult.isErr()) {
+      return res.status(411).send(guidResult.error.message);
+    }
 
-    const result = this.application.update(user);
-    res.json(result);
+    const dataResult = await this.application.delete(guid);
+    if (dataResult.isErr()) {
+      res.status(404).send(dataResult.error.message);
+    } else {
+      const result = new UserDeleteMapping().execute(
+        dataResult.value.properties()
+      );
+      res.json(result);
+    }
   }
 }

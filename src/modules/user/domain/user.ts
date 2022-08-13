@@ -13,7 +13,7 @@ interface UserOptional {
   guid: string;
 }
 
-type UserUpdate = {
+export type UserUpdate = {
   name: string;
   lastname: string;
   email: EmailVO;
@@ -48,7 +48,7 @@ export default class User implements IEntity<UserProperties, UserUpdate> {
     };
   }
 
-  update(fields: UserUpdate) {
+  update(fields: Partial<UserUpdate>) {
     Object.assign(this, fields);
   }
 
