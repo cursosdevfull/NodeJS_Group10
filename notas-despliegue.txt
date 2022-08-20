@@ -1,0 +1,11 @@
+Carpeta: Deployment
+1. Copiar el archivo package.json
+2. Instalar las librerías (npm install)
+3. Copiar el resto de archivos del código fuente
+3. Compilar el código fuente (npm run build)
+
+Carpeta: Production
+4. Copiar la carpeta node_modules desde la carpeta Deployment
+5. Copiar el archivo package.json desde la carpeta Deployment
+6. Copiar la carpeta dist
+6. Ejecutar el script prod (npm run prod)
