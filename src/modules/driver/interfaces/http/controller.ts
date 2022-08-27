@@ -1,17 +1,20 @@
 import { NextFunction, Request, Response } from "express";
-import UserApplication from "../../application/user.application";
-import User from "../../domain/user";
-import UserFactory from "../../domain/user-factory";
+import DriverApplication from "../../application/driver.application";
+import Driver from "../../domain/driver";
+import DriverFactory from "../../domain/driver-factory";
 import { EmailVO } from "../../domain/value-objects/email.vo";
-import { UserInsertMapping } from "./dto/response/user-insert.dto";
-import { UserListOneMapping } from "./dto/response/user-list-one.dto";
-import { UserListDTO, UserListMapping } from "./dto/response/user-list.dto";
+import { DriverInsertMapping } from "./dto/response/driver-insert.dto";
+import { DriverListOneMapping } from "./dto/response/driver-list-one.dto";
+import {
+  DriverListDTO,
+  DriverListMapping,
+} from "./dto/response/driver-list.dto";
 import { GuidVO } from "../../domain/value-objects/guid.vo";
-import { UserDeleteMapping } from "./dto/response/user-delete.dto";
+import { DriverDeleteMapping } from "./dto/response/driver-delete.dto";
 import { IError } from "../helper/ierror";
 
 export default class {
-  constructor(private application: UserApplication) {
+  constructor(private application: DriverApplication) {
     this.list = this.list.bind(this);
     this.listOne = this.listOne.bind(this);
     this.insert = this.insert.bind(this);
@@ -21,8 +24,8 @@ export default class {
 
   async list(req: Request, res: Response) {
     const list = await this.application.list();
-    const result: UserListDTO = new UserListMapping().execute(
-      list.map((user) => user.properties())
+    const result: DriverListDTO = new DriverListMapping().execute(
+      list.map((driver) => driver.properties())
     );
     res.json(result);
   }
@@ -37,20 +40,20 @@ export default class {
       return next(err);
     }
 
-    const userResult = await this.application.listOne(guid);
+    const driverResult = await this.application.listOne(guid);
 
-    if (userResult.isErr()) {
-      return res.status(404).send(userResult.error.message);
-    } else if (userResult.isOk()) {
-      const result = new UserListOneMapping().execute(
-        userResult.value.properties()
+    if (driverResult.isErr()) {
+      return res.status(404).send(driverResult.error.message);
+    } else if (driverResult.isOk()) {
+      const result = new DriverListOneMapping().execute(
+        driverResult.value.properties()
       );
       return res.json(result);
     }
   }
 
   async insert(req: Request, res: Response, next: NextFunction) {
-    const { name, lastname, email, password } = req.body;
+    const { name, lastname, email, photo, driverLicense } = req.body;
 
     const emailResult = EmailVO.create(email);
     if (emailResult.isErr()) {
@@ -59,21 +62,30 @@ export default class {
       return next(err);
     }
 
-    const userResult = await new UserFactory().create(
+    const driverResult = await new DriverFactory().create(
       name,
       lastname,
       emailResult.value,
-      password
+      photo,
+      driverLicense
     );
 
-    if (userResult.isErr()) {
-      const err: IError = new Error(userResult.error.message);
+    if (driverResult.isErr()) {
+      const err: IError = new Error(driverResult.error.message);
       err.status = 411;
       return next(err);
-      //return res.status(411).send(userResult.error.message);
+      //return res.status(411).send(driverResult.error.message);
     } else {
-      const data = await this.application.insert(userResult.value);
-      const result = new UserInsertMapping().execute(data.properties());
+      const dataResult = await this.application.insert(driverResult.value);
+      if (dataResult.isErr()) {
+        const err: IError = new Error(dataResult.error.message);
+        err.status = 411;
+        return next(err);
+      }
+
+      const result = new DriverInsertMapping().execute(
+        dataResult.value.properties()
+      );
       res.json(result);
     }
   }
@@ -95,7 +107,7 @@ export default class {
       err.status = 411;
       return next(err);
     } else {
-      const result = new UserInsertMapping().execute(
+      const result = new DriverInsertMapping().execute(
         dataResult.value.properties()
       );
       res.json(result);
@@ -118,7 +130,7 @@ export default class {
       err.status = 404;
       return next(err);
     } else {
-      const result = new UserDeleteMapping().execute(
+      const result = new DriverDeleteMapping().execute(
         dataResult.value.properties()
       );
       res.json(result);

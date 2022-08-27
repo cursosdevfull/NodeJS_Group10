@@ -8,6 +8,15 @@ import {
   UserPasswordRequiredException,
   UserPasswordLengthInvalidException,
 } from "./exceptions/user.exception";
+import { err, ok, Result } from "neverthrow";
+
+export type UserResult = Result<
+  User,
+  | UserNameRequiredException
+  | UserLastnameRequiredException
+  | UserPasswordRequiredException
+  | UserPasswordLengthInvalidException
+>;
 
 export default class UserFactory {
   async create(
@@ -15,21 +24,21 @@ export default class UserFactory {
     lastname: string,
     email: EmailVO,
     password: string
-  ) {
+  ): Promise<UserResult> {
     if (!name || name.trim() === "") {
-      throw new UserNameRequiredException();
+      return err(new UserNameRequiredException());
     }
 
     if (!lastname || lastname.trim() === "") {
-      throw new UserLastnameRequiredException();
+      return err(new UserLastnameRequiredException());
     }
 
     if (!password || password.trim() === "") {
-      throw new UserPasswordRequiredException();
+      return err(new UserPasswordRequiredException());
     }
 
     if (password.length < 5) {
-      throw new UserPasswordLengthInvalidException(password);
+      return err(new UserPasswordLengthInvalidException(password));
     }
 
     const passwordHash = await UserPasswordService.hash(password);
@@ -44,6 +53,6 @@ export default class UserFactory {
     };
 
     const user = new User(userProperties);
-    return user;
+    return ok(user);
   }
 }

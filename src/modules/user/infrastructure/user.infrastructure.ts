@@ -4,30 +4,45 @@ import { EmailVO } from "../domain/value-objects/email.vo";
 import { UserEntity } from "./user.entity";
 import DataBaseBootstrap from "../../../bootstrap/database.bootstrap";
 import { err, ok, Result } from "neverthrow";
-import { UserNotFoundException } from "../domain/exceptions/user.exception";
+import {
+  UserEmailInvalidException,
+  UserNotFoundException,
+} from "../domain/exceptions/user.exception";
 
 export default class UserInfrastructure implements UserRepository {
   async list(): Promise<User[]> {
+    console.log(UserEntity);
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
 
     const result = await repo.find({ where: { active: true } });
-    return result.map(
-      (el: UserEntity) =>
-        new User({
-          guid: el.guid,
-          name: el.name,
-          lastname: el.lastname,
-          email: EmailVO.create(el.email),
-          password: el.password,
-          refreshToken: el.refreshToken,
-          active: el.active,
-        })
-    );
+    return result.map((el: UserEntity) => {
+      const emailResult = EmailVO.create(el.email);
+      if (emailResult.isErr()) {
+        throw new UserEmailInvalidException();
+      }
+
+      return new User({
+        guid: el.guid,
+        name: el.name,
+        lastname: el.lastname,
+        email: emailResult.value,
+        password: el.password,
+        refreshToken: el.refreshToken,
+        active: el.active,
+      });
+    });
   }
-  async listOne(guid: string): Promise<Result<User, UserNotFoundException>> {
+  async listOne(
+    guid: string
+  ): Promise<Result<User, UserNotFoundException | UserEmailInvalidException>> {
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
 
     const result = await repo.findOne({ where: { guid } });
+    const emailResult = EmailVO.create(result.email);
+
+    if (emailResult.isErr()) {
+      return err(new UserEmailInvalidException());
+    }
 
     if (!result) {
       return err(new UserNotFoundException());
@@ -37,7 +52,7 @@ export default class UserInfrastructure implements UserRepository {
           guid: result.guid,
           name: result.name,
           lastname: result.lastname,
-          email: EmailVO.create(result.email),
+          email: emailResult.value,
           password: result.password,
           refreshToken: result.refreshToken,
           active: result.active,
@@ -79,13 +94,18 @@ export default class UserInfrastructure implements UserRepository {
     if (userFound) {
       Object.assign(userFound, user);
       const userEntity = await repo.save(userFound);
+      const emailResult = EmailVO.create(userEntity.email);
+
+      if (emailResult.isErr()) {
+        return err(new UserEmailInvalidException());
+      }
 
       return ok(
         new User({
           guid: userEntity.guid,
           name: userEntity.name,
           lastname: userEntity.lastname,
-          email: EmailVO.create(userEntity.email),
+          email: emailResult.value,
           password: userEntity.password,
           refreshToken: userEntity.refreshToken,
           active: userEntity.active,
@@ -96,7 +116,9 @@ export default class UserInfrastructure implements UserRepository {
     }
   }
 
-  async delete(guid: string): Promise<Result<User, UserNotFoundException>> {
+  async delete(
+    guid: string
+  ): Promise<Result<User, UserNotFoundException | UserEmailInvalidException>> {
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
 
     const userFound = await repo.findOne({
@@ -106,13 +128,18 @@ export default class UserInfrastructure implements UserRepository {
     if (userFound) {
       userFound.active = false;
       const userEntity = await repo.save(userFound);
+      const emailResult = EmailVO.create(userEntity.email);
+
+      if (emailResult.isErr()) {
+        return err(new UserEmailInvalidException());
+      }
 
       return ok(
         new User({
           guid: userEntity.guid,
           name: userEntity.name,
           lastname: userEntity.lastname,
-          email: EmailVO.create(userEntity.email),
+          email: emailResult.value,
           password: userEntity.password,
           refreshToken: userEntity.refreshToken,
           active: userEntity.active,

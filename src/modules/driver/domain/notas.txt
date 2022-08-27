@@ -5,3 +5,4 @@ entidad
 - email
 - active
 - driverLicense
+- photo
