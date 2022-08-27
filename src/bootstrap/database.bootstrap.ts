@@ -8,6 +8,8 @@ export default class extends Bootstrap {
   initialize(): Promise<any> {
     const dbConfig: DB_CONFIG = AppService.DbConfig;
 
+    console.log(dbConfig);
+
     const AppDataSource = new DataSource({
       type: "mysql",
       ...dbConfig,

@@ -1,3 +1,7 @@
+import yenv from "yenv";
+
+const env = yenv(".env");
+
 export interface DB_CONFIG {
   host: string;
   port: number;
@@ -11,19 +15,21 @@ export interface DB_CONFIG {
 
 export class AppService {
   static get PORT(): number {
-    return +process.env.PORT || 4000;
+    return +env.PORT || 4000;
   }
 
   static get DbConfig(): DB_CONFIG {
+    const pass = env.DB_PASS.toString();
+
     return {
-      host: process.env.DB_HOST || "localhost",
-      port: +process.env.DB_PORT || 3307,
-      entities: [process.env.DB_ENTITIES || "dist/**/*.entity{.ts,.js}"],
-      username: process.env.DB_USER || "user",
-      password: process.env.DB_PASS || "12345",
-      database: process.env.DB_NAME || "curso10",
-      synchronize: process.env.DB_SYNC === "true" ? true : false,
-      logging: process.env.DB_LOGG === "true" ? true : false,
+      host: env.DB_HOST || "localhost",
+      port: +env.DB_PORT || 3307,
+      entities: [env.DB_ENTITIES || "dist/**/*.entity{.ts,.js}"],
+      username: env.DB_USER || "user",
+      password: pass || "12345",
+      database: env.DB_NAME || "curso10",
+      synchronize: env.DB_SYNC || false,
+      logging: env.DB_LOGG || false,
     };
   }
 }
