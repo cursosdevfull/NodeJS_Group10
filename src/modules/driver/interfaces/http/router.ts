@@ -28,7 +28,11 @@ class DriverRouter {
 
   mountRoutes() {
     this.expressRouter.get("/", Cache.handle(this.prefix), controller.list);
-    this.expressRouter.get("/:guid", controller.listOne);
+    this.expressRouter.get(
+      "/:guid",
+      Cache.handle(this.prefix),
+      controller.listOne
+    );
     this.expressRouter.post(
       "/",
       uploadMiddleware.save(

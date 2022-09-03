@@ -51,6 +51,8 @@ export default class {
       const result = new DriverListOneMapping().execute(
         driverResult.value.properties()
       );
+
+      RedisBootstrap.set(res.locals.cacheKey, JSON.stringify(result));
       return res.json(result);
     }
   }
@@ -89,6 +91,8 @@ export default class {
       const result = new DriverInsertMapping().execute(
         dataResult.value.properties()
       );
+
+      RedisBootstrap.clear("DRIVERS");
       res.json(result);
     }
   }
