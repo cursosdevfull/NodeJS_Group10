@@ -12,6 +12,7 @@ import {
 import { GuidVO } from "../../domain/value-objects/guid.vo";
 import { DriverDeleteMapping } from "./dto/response/driver-delete.dto";
 import { IError } from "../../../../helpers/ierror";
+import RedisBootstrap from "../../../../bootstrap/redis.bootstrap";
 
 export default class {
   constructor(private application: DriverApplication) {
@@ -27,6 +28,8 @@ export default class {
     const result: DriverListDTO = new DriverListMapping().execute(
       list.map((driver) => driver.properties())
     );
+
+    RedisBootstrap.set(res.locals.cacheKey, JSON.stringify(result));
     res.json(result);
   }
 

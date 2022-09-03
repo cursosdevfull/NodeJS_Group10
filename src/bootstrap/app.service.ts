@@ -13,6 +13,13 @@ export interface DB_CONFIG {
   logging: boolean;
 }
 
+export interface REDIS_CONFIG {
+  host: string;
+  port: number;
+  password: string;
+  maxRetriesPerRequest: number;
+}
+
 export class AppService {
   static get PORT(): number {
     return +env.PORT || 4000;
@@ -30,6 +37,15 @@ export class AppService {
       database: env.DB_NAME || "curso10",
       synchronize: env.DB_SYNC || false,
       logging: env.DB_LOGG || false,
+    };
+  }
+
+  static get RedisConfig(): REDIS_CONFIG {
+    return {
+      host: env.REDIS_HOST || "localhost",
+      port: +env.REDIS_PORT || 6379,
+      password: env.REDIS_PASS || "",
+      maxRetriesPerRequest: 5,
     };
   }
 

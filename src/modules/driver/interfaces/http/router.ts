@@ -1,10 +1,10 @@
-import { validate, validateOrReject } from "class-validator";
 import { Router } from "express";
 import { UploadBuilder } from "../../../../core/infrastructure/upload.builder";
 import {
   FactoryAWS,
   IUploadImage,
 } from "../../../../core/infrastructure/upload.middleware";
+import Cache from "../../../../helpers/cache";
 import DriverApplication from "../../application/driver.application";
 import { DriverRepository } from "../../domain/driver.repository";
 import DriverInfrastructure from "../../infrastructure/driver.infrastructure";
@@ -19,6 +19,7 @@ const uploadMiddleware: IUploadImage = new FactoryAWS();
 
 class DriverRouter {
   readonly expressRouter;
+  private readonly prefix = "DRIVERS";
 
   constructor() {
     this.expressRouter = Router();
@@ -26,7 +27,7 @@ class DriverRouter {
   }
 
   mountRoutes() {
-    this.expressRouter.get("/", controller.list);
+    this.expressRouter.get("/", Cache.handle(this.prefix), controller.list);
     this.expressRouter.get("/:guid", controller.listOne);
     this.expressRouter.post(
       "/",
