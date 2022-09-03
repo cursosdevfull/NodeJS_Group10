@@ -21,7 +21,17 @@ services:
     container_name: redis_server
     command: redis-server --requirepass todovale
     ports:
-      - "6380:6379"
+      - "6379:6379"
+    restart: always
+    networks:
+      - net-curso10
+
+  sonarqube-server:
+    image: sonarqube:8-community
+    container_name: sonarqube_server
+    ports:
+      - "9000:9000"
+      - "9092:9092"
     restart: always
     networks:
       - net-curso10
