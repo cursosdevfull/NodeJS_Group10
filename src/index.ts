@@ -3,6 +3,7 @@ import DatabaseBootstrap from "./bootstrap/database.bootstrap";
 import RedisBootstrap from "./bootstrap/redis.bootstrap";
 import Application from "./app";
 import { Bootstrap } from "./bootstrap/bootstrap";
+import { Logger } from "./helpers/logger";
 
 const serverBootstrap: Bootstrap = new ServerBootstrap(Application);
 const databaseBootstrap: Bootstrap = new DatabaseBootstrap();
@@ -14,10 +15,10 @@ const redisBootstrap: Bootstrap = new RedisBootstrap();
     await redisBootstrap.initialize();
     await serverBootstrap.initialize();
 
-    console.log("Server started successfully");
-    console.log("Database started successfully");
-    console.log("Redis started successfully");
+    Logger.getLogger().info("Server started successfully");
+    Logger.getLogger().info("Database started successfully");
+    Logger.getLogger().info("Redis started successfully");
   } catch (error) {
-    console.log(error);
+    Logger.getLogger().error(error);
   }
 })();

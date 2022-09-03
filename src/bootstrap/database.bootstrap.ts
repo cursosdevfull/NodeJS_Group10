@@ -1,12 +1,12 @@
 import { Bootstrap } from "./bootstrap";
 import { DataSource } from "typeorm";
-import { AppService, DB_CONFIG } from "./app.service";
+import { AppService, IDbConfig } from "./app.service";
 
 let appDataSource: DataSource;
 
 export default class extends Bootstrap {
   initialize(): Promise<any> {
-    const dbConfig: DB_CONFIG = AppService.DbConfig;
+    const dbConfig: IDbConfig = AppService.DbConfig;
 
     console.log(dbConfig);
 

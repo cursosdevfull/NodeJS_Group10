@@ -25,7 +25,7 @@ export default class RedisBootstrap extends Bootstrap {
   }
 
   static async get(key: string) {
-    return await redisClient.get(key);
+    return redisClient.get(key);
   }
 
   static async set(key: string, value: string) {

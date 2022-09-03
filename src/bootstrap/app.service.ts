@@ -2,7 +2,7 @@ import yenv from "yenv";
 
 const env = yenv();
 
-export interface DB_CONFIG {
+export interface IDbConfig {
   host: string;
   port: number;
   entities: string[];
@@ -13,7 +13,7 @@ export interface DB_CONFIG {
   logging: boolean;
 }
 
-export interface REDIS_CONFIG {
+export interface IRedisConfig {
   host: string;
   port: number;
   password: string;
@@ -25,7 +25,7 @@ export class AppService {
     return +env.PORT || 4000;
   }
 
-  static get DbConfig(): DB_CONFIG {
+  static get DbConfig(): IDbConfig {
     const pass = env.DB_PASS.toString();
 
     return {
@@ -40,7 +40,7 @@ export class AppService {
     };
   }
 
-  static get RedisConfig(): REDIS_CONFIG {
+  static get RedisConfig(): IRedisConfig {
     return {
       host: env.REDIS_HOST || "localhost",
       port: +env.REDIS_PORT || 6379,
