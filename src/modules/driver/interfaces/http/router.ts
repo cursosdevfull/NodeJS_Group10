@@ -2,8 +2,6 @@ import { validate, validateOrReject } from "class-validator";
 import { Router } from "express";
 import { UploadBuilder } from "../../../../core/infrastructure/upload.builder";
 import {
-  FactoryAzure,
-  FactoryGoogle,
   FactoryAWS,
   IUploadImage,
 } from "../../../../core/infrastructure/upload.middleware";
@@ -11,12 +9,13 @@ import DriverApplication from "../../application/driver.application";
 import { DriverRepository } from "../../domain/driver.repository";
 import DriverInfrastructure from "../../infrastructure/driver.infrastructure";
 import Controller from "./controller";
+import { DriverMiddleware } from "./middlewares/driver.middleware";
 
 const infrastructure: DriverRepository = new DriverInfrastructure();
 const application = new DriverApplication(infrastructure);
 const controller = new Controller(application);
 
-const uploadMiddleware: IUploadImage = new FactoryGoogle();
+const uploadMiddleware: IUploadImage = new FactoryAWS();
 
 class DriverRouter {
   readonly expressRouter;
@@ -36,10 +35,11 @@ class DriverRouter {
           .addFieldName("photo")
           .addMaxSize(8000000)
           .addAllowedMimeTypes(["image/jpeg", "image/png"])
-          .addDestination("uploads")
+          .addDestination("drivers/photos")
           .addIsPublic(true)
           .build()
       ),
+      DriverMiddleware.ValidateInsert,
       controller.insert
     );
     this.expressRouter.put("/:guid", controller.update);

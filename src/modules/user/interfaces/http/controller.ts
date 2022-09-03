@@ -8,7 +8,7 @@ import { UserListOneMapping } from "./dto/response/user-list-one.dto";
 import { UserListDTO, UserListMapping } from "./dto/response/user-list.dto";
 import { GuidVO } from "../../domain/value-objects/guid.vo";
 import { UserDeleteMapping } from "./dto/response/user-delete.dto";
-import { IError } from "../helper/ierror";
+import { IError } from "../../../../helpers/ierror";
 
 export default class {
   constructor(private application: UserApplication) {

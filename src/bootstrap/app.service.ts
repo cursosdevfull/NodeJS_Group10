@@ -1,6 +1,6 @@
 import yenv from "yenv";
 
-const env = yenv(".env");
+const env = yenv();
 
 export interface DB_CONFIG {
   host: string;
@@ -31,5 +31,9 @@ export class AppService {
       synchronize: env.DB_SYNC || false,
       logging: env.DB_LOGG || false,
     };
+  }
+
+  static get S3_BUCKET_NAME_PHOTOS(): string {
+    return env.S3_BUCKET_NAME_PHOTOS;
   }
 }

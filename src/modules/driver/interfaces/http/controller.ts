@@ -11,7 +11,7 @@ import {
 } from "./dto/response/driver-list.dto";
 import { GuidVO } from "../../domain/value-objects/guid.vo";
 import { DriverDeleteMapping } from "./dto/response/driver-delete.dto";
-import { IError } from "../helper/ierror";
+import { IError } from "../../../../helpers/ierror";
 
 export default class {
   constructor(private application: DriverApplication) {

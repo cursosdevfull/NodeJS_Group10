@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
+import multer from "multer";
+import multer_s3 from "multer-s3";
+import { S3Client } from "@aws-sdk/client-s3";
 import { ParsedQs } from "qs";
 import { UploadBuilder, UploadOptions } from "./upload.builder";
+import yenv from "yenv";
+import { IError } from "src/helpers/ierror";
 
+const env = yenv();
 export interface IUploadImage {
   save(
     options: UploadOptions
@@ -11,11 +17,34 @@ export interface IUploadImage {
 
 export class FactoryAWS implements IUploadImage {
   save(options: UploadOptions) {
-    return (req: Request, res: Response, next: NextFunction) => {
-      console.log("FactoryAWS");
-      console.log(options);
-      next();
-    };
+    return multer({
+      limits: { fileSize: options.maxSize },
+      storage: multer_s3({
+        s3: new S3Client({}),
+        bucket: env.S3_BUCKET_NAME_PHOTOS,
+        acl: options.isPublic ? "public-read" : "",
+        //metadata: (req, file, cb) => {}
+        metadata(req, file, cb) {
+          cb(null, { fieldName: file.fieldname });
+        },
+        key(req: Request, file, cb) {
+          const mimetype = file.mimetype;
+          const isFileAllowed = options.allowedMimeTypes.includes(mimetype);
+
+          if (!isFileAllowed) {
+            const error: IError = new Error("File type not allowed");
+            error.status = 422;
+            return cb(error, null);
+          }
+
+          const partsFileName = file.originalname.split(".");
+          const extension = partsFileName[partsFileName.length - 1];
+          const fileName = `${options.destination}/${Date.now()}.${extension}`;
+          req.body[options.fieldName] = fileName;
+          cb(null, fileName);
+        },
+      }),
+    }).single(options.fieldName);
   }
 }
 

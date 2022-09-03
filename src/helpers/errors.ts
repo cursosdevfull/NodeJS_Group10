@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IError } from "src/modules/user/interfaces/helper/ierror";
+import { IError } from "src/helpers/ierror";
 
 export default class {
   static notFound(req: Request, res: Response): void {
