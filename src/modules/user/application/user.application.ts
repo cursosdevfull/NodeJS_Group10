@@ -1,4 +1,3 @@
-import { err } from "neverthrow";
 import User, { UserProperties, UserUpdate } from "../domain/user";
 import { UserRepository } from "../domain/user.repository";
 
@@ -13,7 +12,7 @@ export default class UserApplication {
     return this.userRepository.listOne(guid);
   }
 
-  insert(user: User) {
+  async insert(user: User) {
     return this.userRepository.insert(user);
   }
 

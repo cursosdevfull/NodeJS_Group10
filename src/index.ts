@@ -10,15 +10,15 @@ const databaseBootstrap: Bootstrap = new DatabaseBootstrap();
 const redisBootstrap: Bootstrap = new RedisBootstrap();
 
 (async () => {
-  try {
-    await databaseBootstrap.initialize();
-    await redisBootstrap.initialize();
-    await serverBootstrap.initialize();
+  //try {
+  await databaseBootstrap.initialize();
+  await redisBootstrap.initialize();
+  await serverBootstrap.initialize();
 
-    Logger.getLogger().info("Server started successfully");
-    Logger.getLogger().info("Database started successfully");
-    Logger.getLogger().info("Redis started successfully");
-  } catch (error) {
+  Logger.getLogger().info("Server started successfully");
+  Logger.getLogger().info("Database started successfully");
+  Logger.getLogger().info("Redis started successfully");
+  /*} catch (error) {
     Logger.getLogger().error(error);
-  }
+  }*/
 })();

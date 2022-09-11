@@ -11,7 +11,6 @@ import {
 
 export default class UserInfrastructure implements UserRepository {
   async list(): Promise<User[]> {
-    console.log(UserEntity);
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
 
     const result = await repo.find({ where: { active: true } });

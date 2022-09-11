@@ -1,10 +1,12 @@
 import express, { Application } from "express";
 import routerUser from "./modules/user/interfaces/http/router";
 import routerDriver from "./modules/driver/interfaces/http/router";
+import routerAuth from "./modules/auth/interfaces/http/auth.route";
 import routerHealth from "./helpers/health";
 import HandlerErrors from "./helpers/errors";
 import multer from "multer";
 import RedisBootstrap from "./bootstrap/redis.bootstrap";
+import { Authentication } from "./middlewares/authentication.middleware";
 class App {
   readonly expressApp: Application;
 
@@ -36,8 +38,9 @@ class App {
   }
 
   mountRoutes(): void {
-    this.expressApp.use("/user", routerUser);
+    this.expressApp.use("/user", Authentication.canActivate, routerUser);
     this.expressApp.use("/driver", routerDriver);
+    this.expressApp.use("/auth", routerAuth);
   }
 
   mountInvalidationCache(): void {

@@ -9,6 +9,9 @@ import {
   DriverNotFoundException,
 } from "../domain/exceptions/driver.exception";
 import { DriverDatabaseException } from "./exceptions/driver.exception";
+import { Trace } from "../../../helpers/trace";
+import { Logger } from "../../../helpers/logger";
+import { InfoLogger } from "../../../helpers/info-logger";
 
 export default class DriverInfrastructure implements DriverRepository {
   async list(): Promise<Driver[]> {
@@ -45,11 +48,23 @@ export default class DriverInfrastructure implements DriverRepository {
 
     if (emailResult.isErr()) {
       return err(new DriverEmailInvalidException());
+    } else {
+      return err(new DriverEmailInvalidException());
     }
 
-    if (!result) {
+    /* if (!result) {
       return err(new DriverNotFoundException());
     } else {
+      const info: InfoLogger = {
+        traceId: Trace.traceId(),
+        typeElement: "DriverInfrastructure",
+        typeAction: "listOne",
+        message: "Listing one driver",
+        request: JSON.stringify({ guid }),
+        datetime: new Date(),
+      };
+      Logger.getLogger().info(info);
+
       return ok(
         new Driver({
           guid: result.guid,
@@ -61,7 +76,7 @@ export default class DriverInfrastructure implements DriverRepository {
           active: result.active,
         })
       );
-    }
+    } */
   }
 
   async insert(

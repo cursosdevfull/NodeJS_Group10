@@ -1,4 +1,5 @@
 import * as winston from "winston";
+const logstash = require("winston-logstash-transport");
 
 export class Logger {
   static instance: Logger;
@@ -16,7 +17,10 @@ export class Logger {
   static getLogger(): winston.Logger {
     if (!Logger.instance) {
       Logger.instance = new Logger();
-      Logger.instance.addTransport(Transport.console).apply();
+      Logger.instance
+        .addTransport(Transport.console)
+        .addTransport(Transport.ekl)
+        .apply();
     }
     return Logger.instance.logger;
   }
@@ -53,6 +57,13 @@ export class Transport {
         })
       ),
       handleExceptions: true,
+    });
+  }
+
+  static get ekl() {
+    return new logstash.LogstashTransport({
+      host: "localhost",
+      port: 1514,
     });
   }
 }

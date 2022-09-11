@@ -13,6 +13,9 @@ import { GuidVO } from "../../domain/value-objects/guid.vo";
 import { DriverDeleteMapping } from "./dto/response/driver-delete.dto";
 import { IError } from "../../../../helpers/ierror";
 import RedisBootstrap from "../../../../bootstrap/redis.bootstrap";
+import { Trace } from "../../../../helpers/trace";
+import { Logger } from "../../../../helpers/logger";
+import { InfoLogger } from "../../../../helpers/info-logger";
 
 export default class {
   constructor(private application: DriverApplication) {
@@ -36,6 +39,16 @@ export default class {
   async listOne(req: Request, res: Response, next: NextFunction) {
     const { guid } = req.params;
 
+    const info: InfoLogger = {
+      traceId: Trace.traceId(true),
+      typeElement: "Driver Controller",
+      typeAction: "listOne",
+      message: `List one driver with guid: ${guid}`,
+      request: JSON.stringify({ guid }),
+      datetime: new Date(),
+    };
+    Logger.getLogger().info(JSON.stringify(info));
+
     const guidResult = GuidVO.create(guid);
     if (guidResult.isErr()) {
       const err: IError = new Error(guidResult.error.message);
@@ -46,14 +59,22 @@ export default class {
     const driverResult = await this.application.listOne(guid);
 
     if (driverResult.isErr()) {
-      return res.status(404).send(driverResult.error.message);
+      const err: IError = new Error(driverResult.error.message);
+      err.status = 404;
+      //return res.status(404).send(driverResult.error.message);
+      return next(err);
     } else if (driverResult.isOk()) {
       const result = new DriverListOneMapping().execute(
         driverResult.value.properties()
       );
 
-      RedisBootstrap.set(res.locals.cacheKey, JSON.stringify(result));
-      return res.json(result);
+      const responseResult = {
+        traceId: Trace.traceId(),
+        result,
+      };
+
+      RedisBootstrap.set(res.locals.cacheKey, JSON.stringify(responseResult));
+      return res.json(responseResult);
     }
   }
 
