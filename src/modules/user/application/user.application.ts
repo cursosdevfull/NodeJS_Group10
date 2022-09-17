@@ -1,5 +1,5 @@
-import User, { UserProperties, UserUpdate } from "../domain/user";
-import { UserRepository } from "../domain/user.repository";
+import User, { UserUpdate } from '../domain/user';
+import { UserRepository } from '../domain/user.repository';
 
 export default class UserApplication {
   constructor(private readonly userRepository: UserRepository) {}

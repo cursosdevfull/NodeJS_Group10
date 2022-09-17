@@ -1,23 +1,23 @@
-import { UserEntity } from "../../user/infrastructure/user.entity";
-import { Auth } from "../domain/auth";
-import { AuthRepository } from "../domain/auth.repository";
-import { Tokens } from "../domain/tokens.interface";
-import DataBaseBootstrap from "../../../bootstrap/database.bootstrap";
+import DataBaseBootstrap from '../../../bootstrap/database.bootstrap';
+import { Role } from '../../role/domain/role';
+import { UserEntity } from '../../user/infrastructure/user.entity';
+import { Auth } from '../domain/auth';
+import { AuthRepository } from '../domain/auth.repository';
 
 export class AuthInfrastructure implements AuthRepository {
-  async getUserByRefreshToken(
-    refreshToken: string
-  ): Promise<{
+  async getUserByRefreshToken(refreshToken: string): Promise<{
     name: string;
     lastname: string;
     password: string;
     email: string;
     refreshToken: string;
-    guid: string
+    guid: string;
+    roles: string[] | number[] | Role[];
   }> {
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
     const result = await repo.findOne({
       where: { refreshToken },
+      relations: ["roles"],
     });
 
     if (!result) {
@@ -30,7 +30,8 @@ export class AuthInfrastructure implements AuthRepository {
       lastname: result.lastname,
       password: result.password,
       refreshToken: result.refreshToken,
-      guid: result.guid
+      guid: result.guid,
+      roles: result.roles.map((el) => el.name),
     };
   }
 
@@ -40,10 +41,12 @@ export class AuthInfrastructure implements AuthRepository {
     email: string;
     password: string;
     refreshToken: string;
+    roles: string[] | number[] | Role[];
   }> {
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
     const result = await repo.findOne({
       where: { email: auth.properties().email },
+      relations: ["roles"],
     });
 
     if (!result) {
@@ -56,6 +59,7 @@ export class AuthInfrastructure implements AuthRepository {
       lastname: result.lastname,
       password: result.password,
       refreshToken: result.refreshToken,
+      roles: result.roles.map((el) => el.name),
     };
   }
 }

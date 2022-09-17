@@ -1,6 +1,7 @@
-import IORedis from "ioredis";
-import { AppService } from "./app.service";
-import { Bootstrap } from "./bootstrap";
+import IORedis from 'ioredis';
+
+import { AppService } from './app.service';
+import { Bootstrap } from './bootstrap';
 
 let redisClient: any;
 
@@ -41,5 +42,9 @@ export default class RedisBootstrap extends Bootstrap {
     });
 
     pipeline.exec();
+  }
+
+  close() {
+    redisClient.disconnect();
   }
 }

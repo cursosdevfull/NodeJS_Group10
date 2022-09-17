@@ -1,10 +1,14 @@
-import { IEntity } from "src/modules/shared/interface/entity.interface";
-import { EmailVO } from "./value-objects/email.vo";
+import { IEntity } from 'src/modules/shared/interface/entity.interface';
+
+import { Role } from '../../role/domain/role';
+import { EmailVO } from './value-objects/email.vo';
+
 interface UserRequired {
   name: string;
   lastname: string;
   email: EmailVO;
   password: string;
+  roles: number[] | string[] | Role[];
 }
 
 interface UserOptional {
@@ -19,6 +23,7 @@ export type UserUpdate = {
   email: EmailVO;
   password: string;
   refreshToken: string;
+  roles: number[] | string[] | Role[];
 };
 
 export type UserProperties = Required<UserRequired> & Partial<UserOptional>;
@@ -31,6 +36,7 @@ export default class User implements IEntity<UserProperties, UserUpdate> {
   private refreshToken: string;
   private active: boolean;
   private readonly guid: string;
+  private roles: number[] | string[] | Role[];
 
   constructor(userProperties: UserProperties) {
     this.active = true;
@@ -46,6 +52,7 @@ export default class User implements IEntity<UserProperties, UserUpdate> {
       refreshToken: this.refreshToken,
       active: this.active,
       guid: this.guid,
+      roles: this.roles,
     };
   }
 

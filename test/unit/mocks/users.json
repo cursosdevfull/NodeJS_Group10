@@ -1,0 +1,20 @@
+[
+  {
+    "active": true,
+    "guid": "efaff3b2-85c0-4b39-bb1d-0bbf25390d3d",
+    "name": "Sergio",
+    "lastname": "Hidalgo",
+    "email": "sergio@correo.com",
+    "password": "$2a$10$URPjStCrO37wDB97K8/xS.gBxLfAWBtJ0rNlLuOnCTLnKkOoZY.kW",
+    "refreshToken": "4ff853af-8718-41cc-a717-5ba59b37d366"
+  },
+  {
+    "active": true,
+    "guid": "efaff3b2-85c0-4b39-bb1d-0bbf25390d3d",
+    "name": "Javier",
+    "lastname": "Madrid",
+    "email": "javier@correo.com",
+    "password": "$2a$10$URPjStCrO37wDB97K8/xS.gBxLfAWBtJ0rNlLuOnCTLnKkOoZY.kW",
+    "refreshToken": "4ff853af-8718-41cc-a717-5ba59b37d366"
+  }
+]

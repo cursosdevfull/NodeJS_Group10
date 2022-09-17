@@ -1,12 +1,15 @@
-import express, { Application } from "express";
-import routerUser from "./modules/user/interfaces/http/router";
-import routerDriver from "./modules/driver/interfaces/http/router";
-import routerAuth from "./modules/auth/interfaces/http/auth.route";
-import routerHealth from "./helpers/health";
-import HandlerErrors from "./helpers/errors";
-import multer from "multer";
-import RedisBootstrap from "./bootstrap/redis.bootstrap";
-import { Authentication } from "./middlewares/authentication.middleware";
+import express, { Application } from 'express';
+import multer from 'multer';
+
+import RedisBootstrap from './bootstrap/redis.bootstrap';
+import HandlerErrors from './helpers/errors';
+import routerHealth from './helpers/health';
+import { Authentication } from './middlewares/authentication.middleware';
+import { Authorization } from './middlewares/authorization.middleware';
+import routerAuth from './modules/auth/interfaces/http/auth.route';
+import routerDriver from './modules/driver/interfaces/http/router';
+import routerUser from './modules/user/interfaces/http/router';
+
 class App {
   readonly expressApp: Application;
 
@@ -38,7 +41,12 @@ class App {
   }
 
   mountRoutes(): void {
-    this.expressApp.use("/user", Authentication.canActivate, routerUser);
+    this.expressApp.use(
+      "/user",
+      Authentication.canActivate,
+      Authorization.canActive("ADMINISTRATOR", "SUPER"),
+      routerUser
+    );
     this.expressApp.use("/driver", routerDriver);
     this.expressApp.use("/auth", routerAuth);
   }

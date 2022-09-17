@@ -1,14 +1,15 @@
-import { v4 as uuidv4 } from "uuid";
-import { UserPasswordService } from "./services/user-password.service";
-import User, { UserProperties } from "./user";
-import { EmailVO } from "./value-objects/email.vo";
+import { err, ok, Result } from 'neverthrow';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   UserLastnameRequiredException,
   UserNameRequiredException,
-  UserPasswordRequiredException,
   UserPasswordLengthInvalidException,
-} from "./exceptions/user.exception";
-import { err, ok, Result } from "neverthrow";
+  UserPasswordRequiredException,
+} from './exceptions/user.exception';
+import { UserPasswordService } from './services/user-password.service';
+import User, { UserProperties } from './user';
+import { EmailVO } from './value-objects/email.vo';
 
 export type UserResult = Result<
   User,
@@ -23,7 +24,8 @@ export default class UserFactory {
     name: string,
     lastname: string,
     email: EmailVO,
-    password: string
+    password: string,
+    roles: number[] | string[]
   ): Promise<UserResult> {
     if (!name || name.trim() === "") {
       return err(new UserNameRequiredException());
@@ -50,6 +52,7 @@ export default class UserFactory {
       password: passwordHash,
       guid: uuidv4(),
       refreshToken: uuidv4(),
+      roles,
     };
 
     const user = new User(userProperties);

@@ -1,14 +1,14 @@
-import { NextFunction, Request, Response } from "express";
-import UserApplication from "../../application/user.application";
-import User from "../../domain/user";
-import UserFactory from "../../domain/user-factory";
-import { EmailVO } from "../../domain/value-objects/email.vo";
-import { UserInsertMapping } from "./dto/response/user-insert.dto";
-import { UserListOneMapping } from "./dto/response/user-list-one.dto";
-import { UserListDTO, UserListMapping } from "./dto/response/user-list.dto";
-import { GuidVO } from "../../domain/value-objects/guid.vo";
-import { UserDeleteMapping } from "./dto/response/user-delete.dto";
-import { IError } from "../../../../helpers/ierror";
+import { NextFunction, Request, Response } from 'express';
+
+import { IError } from '../../../../helpers/ierror';
+import UserApplication from '../../application/user.application';
+import UserFactory from '../../domain/user-factory';
+import { EmailVO } from '../../domain/value-objects/email.vo';
+import { GuidVO } from '../../domain/value-objects/guid.vo';
+import { UserDeleteMapping } from './dto/response/user-delete.dto';
+import { UserInsertMapping } from './dto/response/user-insert.dto';
+import { UserListOneMapping } from './dto/response/user-list-one.dto';
+import { UserListDTO, UserListMapping } from './dto/response/user-list.dto';
 
 export default class {
   constructor(private application: UserApplication) {
@@ -50,7 +50,7 @@ export default class {
   }
 
   async insert(req: Request, res: Response, next: NextFunction) {
-    const { name, lastname, email, password } = req.body;
+    const { name, lastname, email, password, roles } = req.body;
 
     const emailResult = EmailVO.create(email);
     if (emailResult.isErr()) {
@@ -63,14 +63,14 @@ export default class {
       name,
       lastname,
       emailResult.value,
-      password
+      password,
+      roles
     );
 
     if (userResult.isErr()) {
       const err: IError = new Error(userResult.error.message);
       err.status = 411;
       return next(err);
-      //return res.status(411).send(userResult.error.message);
     } else {
       const data = await this.application.insert(userResult.value);
       const result = new UserInsertMapping().execute(data.properties());

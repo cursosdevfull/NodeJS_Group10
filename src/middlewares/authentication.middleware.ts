@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { AuthService } from "../modules/auth/application/auth.service";
-import { IError } from "../helpers/ierror";
+import { NextFunction, Request, Response } from 'express';
+
+import { IError } from '../helpers/ierror';
+import { AuthService } from '../modules/auth/application/auth.service';
 
 export class Authentication {
   static canActivate(req: Request, res: Response, next: NextFunction) {
@@ -20,7 +21,8 @@ export class Authentication {
       }
 
       AuthService.validateAccessToken(token)
-        .then((payload) => {
+        .then((payload: any) => {
+          res.locals.roles = payload.roles;
           return next();
         })
         .catch((err) => {

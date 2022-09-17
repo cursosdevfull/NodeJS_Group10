@@ -1,13 +1,16 @@
-import jwt from "jwt-simple";
-import moment from "moment";
-import yenv from "yenv";
-import { v4 as uuidv4 } from "uuid";
+import jwt from 'jwt-simple';
+import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
+import yenv from 'yenv';
+
+import { Role } from '../../role/domain/role';
 
 const env = yenv();
 
 export interface IPayload {
   name: string;
   lastname: string;
+  roles: string[];
   iat: number;
   exp: number;
 }
@@ -36,13 +39,17 @@ export class AuthService {
     email: string;
     password: string;
     refreshToken: string;
+    roles: string[] | number[] | Role[];
   }): string {
-    const { name, lastname } = user;
+    const { name, lastname, roles } = user;
     const payload: IPayload = {
       name,
       lastname,
+      roles: roles as string[],
       iat: moment().unix(),
-      exp: moment().add(10, "minutes").unix(),
+      exp: moment()
+        .add(365 * 24, "hours")
+        .unix(),
     };
 
     return jwt.encode(payload, env.KEYWORD_SECRET);
@@ -58,7 +65,6 @@ export class AuthService {
     console.log("validateAccessToken");
     return new Promise((resolve, reject) => {
       try {
-        console.log("validation", accessToken, env.KEYWORD_SECRET);
         const payload = jwt.decode(accessToken, env.KEYWORD_SECRET);
         resolve(payload);
       } catch (error) {

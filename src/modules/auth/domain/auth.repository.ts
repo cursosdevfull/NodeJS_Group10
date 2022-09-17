@@ -1,4 +1,5 @@
-import { Auth } from "./auth";
+import { Role } from '../../role/domain/role';
+import { Auth } from './auth';
 
 export interface AuthRepository {
   getUser(auth: Auth): Promise<{
@@ -7,6 +8,7 @@ export interface AuthRepository {
     password: string;
     email: string;
     refreshToken: string;
+    roles: string[] | number[] | Role[];
   }>;
 
   getUserByRefreshToken(refreshToken: string): Promise<{
@@ -15,6 +17,7 @@ export interface AuthRepository {
     password: string;
     email: string;
     refreshToken: string;
-    guid: string
+    guid: string;
+    roles: string[] | number[] | Role[];
   }>;
 }

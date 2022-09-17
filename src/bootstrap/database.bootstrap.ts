@@ -1,14 +1,13 @@
-import { Bootstrap } from "./bootstrap";
-import { DataSource } from "typeorm";
-import { AppService, IDbConfig } from "./app.service";
+import { DataSource } from 'typeorm';
+
+import { AppService, IDbConfig } from './app.service';
+import { Bootstrap } from './bootstrap';
 
 let appDataSource: DataSource;
 
 export default class extends Bootstrap {
   initialize(): Promise<any> {
     const dbConfig: IDbConfig = AppService.DbConfig;
-
-    console.log(dbConfig);
 
     const AppDataSource = new DataSource({
       type: "mysql",
@@ -24,5 +23,9 @@ export default class extends Bootstrap {
 
   static get dataSource(): DataSource {
     return appDataSource;
+  }
+
+  close() {
+    appDataSource.destroy();
   }
 }

@@ -1,19 +1,22 @@
-import User, { UserProperties, UserUpdate } from "../domain/user";
-import { UserRepository } from "../domain/user.repository";
-import { EmailVO } from "../domain/value-objects/email.vo";
-import { UserEntity } from "./user.entity";
-import DataBaseBootstrap from "../../../bootstrap/database.bootstrap";
-import { err, ok, Result } from "neverthrow";
-import {
-  UserEmailInvalidException,
-  UserNotFoundException,
-} from "../domain/exceptions/user.exception";
+import { err, ok, Result } from 'neverthrow';
+import { In } from 'typeorm';
+
+import DataBaseBootstrap from '../../../bootstrap/database.bootstrap';
+import { RoleEntity } from '../../role/infrastructure/role.entity';
+import { UserEmailInvalidException, UserNotFoundException } from '../domain/exceptions/user.exception';
+import User, { UserUpdate } from '../domain/user';
+import { UserRepository } from '../domain/user.repository';
+import { EmailVO } from '../domain/value-objects/email.vo';
+import { UserEntity } from './user.entity';
 
 export default class UserInfrastructure implements UserRepository {
   async list(): Promise<User[]> {
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
 
-    const result = await repo.find({ where: { active: true } });
+    const result = await repo.find({
+      where: { active: true },
+      relations: ["roles"],
+    });
     return result.map((el: UserEntity) => {
       const emailResult = EmailVO.create(el.email);
       if (emailResult.isErr()) {
@@ -28,6 +31,7 @@ export default class UserInfrastructure implements UserRepository {
         password: el.password,
         refreshToken: el.refreshToken,
         active: el.active,
+        roles: el.roles,
       });
     });
   }
@@ -36,7 +40,10 @@ export default class UserInfrastructure implements UserRepository {
   ): Promise<Result<User, UserNotFoundException | UserEmailInvalidException>> {
     const repo = DataBaseBootstrap.dataSource.getRepository(UserEntity);
 
-    const result = await repo.findOne({ where: { guid } });
+    const result = await repo.findOne({
+      where: { guid },
+      relations: ["roles"],
+    });
     const emailResult = EmailVO.create(result.email);
 
     if (emailResult.isErr()) {
@@ -55,6 +62,7 @@ export default class UserInfrastructure implements UserRepository {
           password: result.password,
           refreshToken: result.refreshToken,
           active: result.active,
+          roles: result.roles,
         })
       );
     }
@@ -63,8 +71,20 @@ export default class UserInfrastructure implements UserRepository {
   async insert(user: User): Promise<User> {
     const userInsert = new UserEntity();
 
-    const { guid, name, lastname, email, password, refreshToken, active } =
-      user.properties();
+    const {
+      guid,
+      name,
+      lastname,
+      email,
+      password,
+      refreshToken,
+      active,
+      roles,
+    } = user.properties();
+    const rolesUser = await DataBaseBootstrap.dataSource
+      .getRepository(RoleEntity)
+      .findBy({ roleId: In(roles as number[]) });
+
     Object.assign(userInsert, {
       guid,
       name,
@@ -73,6 +93,7 @@ export default class UserInfrastructure implements UserRepository {
       password,
       refreshToken,
       active,
+      roles: rolesUser,
     });
 
     await DataBaseBootstrap.dataSource
@@ -108,6 +129,7 @@ export default class UserInfrastructure implements UserRepository {
           password: userEntity.password,
           refreshToken: userEntity.refreshToken,
           active: userEntity.active,
+          roles: userEntity.roles,
         })
       );
     } else {
@@ -142,6 +164,7 @@ export default class UserInfrastructure implements UserRepository {
           password: userEntity.password,
           refreshToken: userEntity.refreshToken,
           active: userEntity.active,
+          roles: userEntity.roles,
         })
       );
     } else {

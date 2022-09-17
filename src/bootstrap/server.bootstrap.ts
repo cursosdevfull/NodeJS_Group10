@@ -1,7 +1,8 @@
-import http from "http";
-import { Application } from "express";
-import { Bootstrap } from "./bootstrap";
-import { AppService } from "./app.service";
+import { Application } from 'express';
+import http from 'http';
+
+import { AppService } from './app.service';
+import { Bootstrap } from './bootstrap';
 
 export default class extends Bootstrap {
   constructor(private readonly app: Application) {
@@ -25,5 +26,7 @@ export default class extends Bootstrap {
     });
   }
 
-  verifyPort() {}
+  close() {
+    process.exit(0);
+  }
 }
