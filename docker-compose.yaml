@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  mysql-server:
+    image: mysql:8
+    container_name: mysql_server
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=12345
+      - MYSQL_DATABASE=curso10
+    ports:
+      - "3307:3306"
+    networks:
+      - net-curso10
+    volumes:
+      - data-mysql-vol:/var/lib/mysql
+
+  redis-server:
+    image: redis:6.0.5-alpine
+    container_name: redis_server
+    command: redis-server --requirepass todovale
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - net-curso10
+
+  locust-master:
+    build:
+      context: .
+      dockerfile: locust/Dockerfile
+    container_name: locust_master
+    ports:
+      - 8089:8089
+    command: "--host=https://4163-38-25-16-207.ngrok.io --master"
+    networks:
+      - net-curso10
+
+  locust-slave:
+    build:
+      context: .
+      dockerfile: locust/Dockerfile
+    command: "--host=https://4163-38-25-16-207.ngrok.io --master-host=locust-master --slave "
+    networks:
+      - net-curso10
+
+networks:
+  net-curso10:
+
+volumes:
+  data-mysql-vol:
+  data-elasticsearch-vol:
