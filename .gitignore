@@ -5,3 +5,6 @@ curso10
 environments
 .scannerwork
 .env
+elk_config
+environments
+.env
